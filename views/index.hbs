@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>varp</title>
+    <meta name="viewport" content="width=device-width">
+
+    <style>
+      html, body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    {{#each feeds}}
+    <a href="/{{id}}">
+      <img src="{{image}}" alt={{title}} width=200>
+    </a>
+    {{/each}}
+  </body>
+</html>

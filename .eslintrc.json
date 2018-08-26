@@ -1,0 +1,10 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "plugin:github/es6",
+    "plugin:github/app"
+  ]
+}

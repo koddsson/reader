@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const audioElement = document.querySelector('audio')
+        document.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', event => {
+            event.preventDefault()
+            audioElement.src = event.currentTarget.href
+            audioElement.play()
+          })
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <audio controls></audio>
+    <ul>
+      {{#each episodes}}
+      <li><a href="{{url}}">{{title}}</a></li>
+      {{/each}}
+    </ul>
+  </body>
+</html>
