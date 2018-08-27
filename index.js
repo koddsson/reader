@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 app.set('view engine', 'hbs')
+app.use(express.static('public'))
 
 const Parser = require('rss-parser')
 const parser = new Parser()
@@ -24,7 +25,7 @@ app.get('/:feed', async (req, res) => {
     return {title: item.title, url: item.enclosure.url}
   })
 
-  return res.render('series', {episodes})
+  return res.render('series', {title: feeds[req.params.feed].title, episodes})
 })
 
 app.get('/', async (req, res) => {

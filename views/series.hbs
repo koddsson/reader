@@ -1,7 +1,10 @@
 <html>
   <head>
-    <title>{{title}}</title>
+    <title>varp - {{title}}</title>
     <meta name="viewport" content="width=device-width">
+    <link rel="icon" data-emoji="📻" type="image/png">
+
+    <script src="/emoji-favicon.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const audioElement = document.querySelector('audio')
@@ -12,6 +15,7 @@
             audioElement.play()
           })
         })
+
       })
     </script>
   </head>
