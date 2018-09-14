@@ -52,10 +52,18 @@ app.get('/:feed', async (req, res) => {
 })
 
 app.post('/feeds', async (req, res) => {
+  let response
+
+  try {
+    response = await parser.parseURL(req.body.url)
+  } catch (error) {
+    return res.status(500).json({error})
+  }
+
   const {
     title,
     image: {url: image}
-  } = await parser.parseURL(req.body.url)
+  } = response
   return res.json({title, url: req.body.url, image, id: slugify(title)})
 })
 

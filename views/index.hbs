@@ -28,6 +28,9 @@
       .border-top {
         border-top: 1px solid #ababab !important;
       }
+      .border-bottom {
+        border-bottom: 1px solid #ababab !important;
+      }
       .add-button {
         width: 50px;
         border: 0;
@@ -46,8 +49,15 @@
       .feed-url-label {
         padding: 1em 0.5em;
       }
-      h1 {
-        text-align: center;
+      .no-link {
+        text-decoration: none;
+        color: #000000;
+      }
+      .float-right {
+        float: right;
+      }
+      .border-0 {
+        border: 0 !important;
       }
     </style>
     <script>
@@ -73,23 +83,41 @@
             headers: {
               'Content-Type': 'application/json'
             }
+          }).then(response => {
+            if (response.status !== 200) {
+              throw new Error('Error')
+            }
+            return response
           }).then(response => response.json()).then(json => {
             const feeds = JSON.parse(localStorage.getItem('feeds') || '[]')
             feeds.push(json)
             localStorage.setItem('feeds', JSON.stringify(feeds))
             alert('podcast added!')
+            window.location.reload()
           })
+        })
+        document.querySelector('.js-toggle-feed-url').addEventListener('click', event => {
+          event.preventDefault()
+
+          const form = document.querySelector('form')
+          form.classList.toggle('d-flex')
+          form.hidden = !form.hidden
         })
       })
     </script>
   </head>
   <body>
-    <h1>📻 Varp</h1>
-    <div class="feeds"></div>
-    <form class="controls d-flex margin-0">
-      <label for="feed_url" class="feed-url-label border-top">URL: </label>
-      <input id="feed_url" class="feed-url flex-1 border-top" placeholder="http://feeds.wnyc.org/moreperfect" />
-      <button class="add-button">+</button>
+    <div class="d-flex border-bottom">
+      <h1 class="flex-1" style="padding-left: 1em;">
+        <a href="/" class="no-link">📻 Varp</a>
+      </h1>
+      <button class="js-toggle-feed-url add-button border-0" style="padding-right: 1em;">+</button>
+    </div>
+    <form class="margin-0 border-bottom" hidden>
+      <label for="feed_url" class="feed-url-label">URL: </label>
+      <input id="feed_url" class="feed-url flex-1" placeholder="http://feeds.wnyc.org/moreperfect" />
     </form>
+    <div class="feeds"></div>
+    <audio controls class="controls"></audio>
   </body>
 </html>
