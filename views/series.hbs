@@ -15,16 +15,36 @@
             audioElement.play()
           })
         })
+        audioElement.addEventListener('ended', () => {
+          //markEpisodeAsPlayed()
+        })
 
+        const episodesContainer = document.querySelector('.episodes')
+        const feeds = JSON.parse(localStorage.getItem('feeds') || '[]')
+        const feed = feeds.find(f => f.id === window.location.pathname.substr(1))
+        fetch('/feed', {
+          method: 'POST',
+          body: JSON.stringify({url: feed.url}),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json()).then(json => {
+          for(const episode of json.episodes) {
+            const item = document.createElement('li')
+            const link = document.createElement('a')
+            link.href = episode.url
+            link.textContent = episode.title
+            item.appendChild(link)
+            episodesContainer.appendChild(item)
+          }
+        })
       })
     </script>
   </head>
   <body>
     <audio controls></audio>
     <ul>
-      {{#each episodes}}
-      <li><a href="{{url}}">{{title}}</a></li>
-      {{/each}}
+      <div class="episodes"></div>
     </ul>
   </body>
 </html>

@@ -9,13 +9,50 @@
       html, body {
         margin: 0;
       }
+      .feeds {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
     </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const feedContainer = document.querySelector('.feeds')
+        for (const feed of JSON.parse(localStorage.getItem('feeds') || '[]')) {
+          const feedElement = document.createElement('a')
+          feedElement.href = `/${feed.id}`
+          const image = document.createElement('img')
+          image.src = feed.image
+          image.alt = feed.title
+          image.style.width = '100%'
+          feedElement.appendChild(image)
+          feedContainer.appendChild(feedElement)
+        }
+        const form = document.querySelector('form')
+        form.addEventListener('submit', event => {
+          event.preventDefault()
+          const url = event.currentTarget.querySelector('#feed_url').value
+          fetch('/feeds', {
+            method: 'POST',
+            body: JSON.stringify({url}),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }).then(response => response.json()).then(json => {
+            const feeds = JSON.parse(localStorage.getItem('feeds') || '[]')
+            feeds.push(json)
+            localStorage.setItem('feeds', JSON.stringify(feeds))
+            alert('podcast added!')
+          })
+        })
+      })
+    </script>
   </head>
   <body>
-    {{#each feeds}}
-    <a href="/{{id}}">
-      <img src="{{image}}" alt={{title}} width=200>
-    </a>
-    {{/each}}
+    <form>
+      <label for="feed_url">URL: </label>
+      <input id="feed_url" />
+      <button>Add podcast</button>
+    </form>
+    <div class="feeds"></div>
   </body>
 </html>

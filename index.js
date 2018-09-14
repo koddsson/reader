@@ -1,12 +1,27 @@
 const express = require('express')
+const bodyParser = require('body-parser')
+
 const app = express()
 app.set('view engine', 'hbs')
 app.use(express.static('public'))
+app.use(bodyParser.json())
 
 const Parser = require('rss-parser')
 const parser = new Parser()
 
 const port = process.env.PORT || 3000
+
+// From: https://gist.github.com/mathewbyrne/1280286
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\w-]+/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
 
 const feeds = {
   replyall: {
@@ -17,15 +32,26 @@ const feeds = {
   }
 }
 
-app.get('/:feed', async (req, res) => {
-  const url = feeds[req.params.feed].url
-  const feed = await parser.parseURL(url)
+app.post('/feed', async (req, res) => {
+  const {title, items} = await parser.parseURL(req.body.url)
 
-  const episodes = feed.items.map(item => {
+  const episodes = items.map(item => {
     return {title: item.title, url: item.enclosure.url}
   })
 
-  return res.render('series', {title: feeds[req.params.feed].title, episodes})
+  return res.json({title, episodes})
+})
+
+app.get('/:feed', async (req, res) => {
+  return res.render('series')
+})
+
+app.post('/feeds', async (req, res) => {
+  const {
+    title,
+    image: {url: image}
+  } = await parser.parseURL(req.body.url)
+  return res.json({title, url: req.body.url, image, id: slugify(title)})
 })
 
 app.get('/', async (req, res) => {
