@@ -4,17 +4,19 @@
     <meta name="viewport" content="width=device-width">
     <link rel="icon" data-emoji="📻" type="image/png">
 
+    <style>
+      h1 {
+        text-align: center;
+      }
+      .no-link {
+        text-decoration: none;
+        color: #000000;
+      }
+    </style>
     <script src="/emoji-favicon.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const audioElement = document.querySelector('audio')
-        document.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', event => {
-            event.preventDefault()
-            audioElement.src = event.currentTarget.href
-            audioElement.play()
-          })
-        })
         audioElement.addEventListener('ended', () => {
           //markEpisodeAsPlayed()
         })
@@ -34,6 +36,11 @@
             const link = document.createElement('a')
             link.href = episode.url
             link.textContent = episode.title
+            link.addEventListener('click', event => {
+              event.preventDefault()
+              audioElement.src = event.currentTarget.href
+              audioElement.play()
+            })
             item.appendChild(link)
             episodesContainer.appendChild(item)
           }
@@ -42,6 +49,9 @@
     </script>
   </head>
   <body>
+    <h1>
+      <a href="/" class="no-link">📻 Varp</a>
+    </h1>
     <audio controls></audio>
     <ul>
       <div class="episodes"></div>

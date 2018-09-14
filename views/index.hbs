@@ -7,11 +7,47 @@
 
     <style>
       html, body {
-        margin: 0;
+        margin-left: 0;
+        margin-right: 0;
       }
       .feeds {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+      .controls {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+      }
+      .d-flex {
+        display: flex;
+      }
+      .flex-1 {
+        flex: 1;
+      }
+      .border-top {
+        border-top: 1px solid #ababab !important;
+      }
+      .add-button {
+        width: 50px;
+        border: 0;
+        border-left: 1px solid #ababab;
+        border-top: 1px solid #ababab;
+        background: white;
+        font-size: 2em;
+        color: #ababab;
+      }
+      .margin-0 {
+        margin: 0;
+      }
+      .feed-url {
+        border: 0;
+      }
+      .feed-url-label {
+        padding: 1em 0.5em;
+      }
+      h1 {
+        text-align: center;
       }
     </style>
     <script>
@@ -48,11 +84,12 @@
     </script>
   </head>
   <body>
-    <form>
-      <label for="feed_url">URL: </label>
-      <input id="feed_url" />
-      <button>Add podcast</button>
-    </form>
+    <h1>📻 Varp</h1>
     <div class="feeds"></div>
+    <form class="controls d-flex margin-0">
+      <label for="feed_url" class="feed-url-label border-top">URL: </label>
+      <input id="feed_url" class="feed-url flex-1 border-top" placeholder="http://feeds.wnyc.org/moreperfect" />
+      <button class="add-button">+</button>
+    </form>
   </body>
 </html>

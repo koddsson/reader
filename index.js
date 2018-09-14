@@ -35,9 +35,14 @@ const feeds = {
 app.post('/feed', async (req, res) => {
   const {title, items} = await parser.parseURL(req.body.url)
 
-  const episodes = items.map(item => {
-    return {title: item.title, url: item.enclosure.url}
-  })
+  const episodes = items
+    .map(item => {
+      if (!item.enclosure) {
+        return null
+      }
+      return {title: item.title, url: item.enclosure.url}
+    })
+    .filter(x => x)
 
   return res.json({title, episodes})
 })
