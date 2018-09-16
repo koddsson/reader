@@ -64,31 +64,21 @@
         display: flex;
         flex-direction: column;
         margin-bottom: 0.83em;
-        padding: 0.83em;
         border: 1px solid gray;
         box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2)
       }
       
-      .feed-item.small > .body {
-        display: flex;
+      .feed-item > .body{
+        padding: 0 0.83em;
+      }
+
+      .feed-item > .footer {
+        padding: 0.3em 0.83em;
+        font-size: 14px;
       }
       
-      .feed-item.small > .body > .image > img {
-        width: 200px;
-      }
-      
-      .feed-item.small > .body > .content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .feed-item > h3 {
-        margin-top: 0;
-      }
-      .feed-item > h3 > a {
-        /*text-decoration: none;*/
-      }
       .timestamp { text-align: right; }
+
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -142,9 +132,12 @@
         <div class="body">
           {{#markdown}}{{{content}}}{{/markdown}}
         </div>
-        <a href="{{link}}" class="timestamp">
-          <time>{{pubDate}}</time>
-        </a>
+        <div class="footer border-top d-flex">
+          <div class="flex-1">{{title}}</div>
+          <a href="{{link}}" class="timestamp">
+            <time>{{pubDate}}</time>
+          </a>
+        </div>
       </div>
       {{/each}}
     </div>

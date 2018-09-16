@@ -10,5 +10,6 @@ CREATE TABLE posts (
   title varchar(255),
   content text,
   pubDate integer,
-  link varchar(255)
+  link varchar(255),
+  feed_id varchar(255)
 );

@@ -4,6 +4,7 @@ const sqlite = require('sqlite')
 const dbPromise = sqlite.open('./reader.db', {Promise})
 const hbs = require('hbs')
 const markdown = require('helper-markdown')
+const debug = require('debug')('app')
 
 const app = express()
 app.set('view engine', 'hbs')
@@ -43,29 +44,28 @@ async function syncFeeds() {
     try {
       response = await parser.parseURL(feed.url)
     } catch (error) {
-      console.log(error)
+      debug(error)
       return
     }
 
     const feedLastUpdated = new Date(feed.lastUpdated)
     if (new Date(response.lastBuildDate) > feedLastUpdated) {
-      console.log('There are new posts!')
+      debug('There are new posts!')
       for (const item of response.items) {
         const itemPubDate = new Date(item.pubDate)
         if (itemPubDate > new Date(response.lastBuildDate)) return
-        console.log(itemPubDate)
-        console.log(new Date(response.lastBuildDate))
-        await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?)', [
+        await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?)', [
           item.guid.trim(),
           item.title,
           item.content,
           itemPubDate.getTime(),
-          item.link
+          item.link,
+          slugify(feed.title)
         ])
       }
       await db.run('UPDATE feeds SET lastUpdated = ?', [response.lastBuildDate])
     } else {
-      console.log('There are no new posts!')
+      debug('There are no new posts!')
     }
   }
 
@@ -91,7 +91,12 @@ app.post('/feeds', async (req, res) => {
 app.get('/', async (req, res) => {
   await syncFeeds()
   const db = await dbPromise
-  const posts = await db.all('SELECT * FROM posts ORDER BY pubDate DESC LIMIT 50')
+  const posts = await db.all(`
+    SELECT posts.content, posts.link, posts.pubDate, feeds.title FROM posts, feeds
+    WHERE posts.feed_id = feeds.id
+    ORDER BY posts.pubDate DESC
+    LIMIT 50
+  `)
   for (const post of posts) {
     const date = new Date(post.pubDate)
 
@@ -106,4 +111,4 @@ app.get('/', async (req, res) => {
   return res.render('index', {posts})
 })
 
-app.listen(port, () => console.log(`App listening on port ${port}`))
+app.listen(port, () => debug(`App listening on port ${port}`))
