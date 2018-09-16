@@ -68,8 +68,24 @@
         box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2)
       }
       
-      .feed-item > .body{
+      .feed-item > .body {
         padding: 0 0.83em;
+      }
+
+      .feed-item > .body > .post > .body {
+        display: flex;
+      }
+
+      .feed-item > .body > .post > .body > .image {
+        margin: 1em 0;
+      }
+      
+      .feed-item > .body > .post > .body > .content {
+        margin: 0 1em;
+      }
+      
+      .feed-item > .body > .post > .body > .image > img {
+        width: 200px;
       }
 
       .feed-item > .footer {
@@ -78,7 +94,6 @@
       }
       
       .timestamp { text-align: right; }
-
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -129,7 +144,7 @@
     <div class="feeds">
       {{#each posts}}
       <div class="feed-item">
-        <div class="body">
+        <div class="body d-flex">
           {{{content}}}
         </div>
         <div class="footer border-top d-flex">
