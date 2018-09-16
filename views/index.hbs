@@ -1,18 +1,14 @@
 <html>
   <head>
-    <title>varp</title>
+    <title>reader</title>
     <meta name="viewport" content="width=device-width">
-    <link rel="icon" data-emoji="📻" type="image/png">
+    <link rel="icon" data-emoji="📜" type="image/png">
     <script src="/emoji-favicon.js"></script>
 
     <style>
       html, body {
         margin-left: 0;
         margin-right: 0;
-      }
-      .feeds {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       }
       .controls {
         position: absolute;
@@ -59,20 +55,43 @@
       .border-0 {
         border: 0 !important;
       }
+
+      .feeds {
+        margin: 1em;
+      }
+
+      .feed-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.83em;
+        padding: 0.83em;
+        border: 1px solid gray;
+        box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2)
+      }
+      
+      .feed-item.small > .body {
+        display: flex;
+      }
+      
+      .feed-item.small > .body > .image > img {
+        width: 200px;
+      }
+      
+      .feed-item.small > .body > .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .feed-item > h3 {
+        margin-top: 0;
+      }
+      .feed-item > h3 > a {
+        /*text-decoration: none;*/
+      }
+      .timestamp { text-align: right; }
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const feedContainer = document.querySelector('.feeds')
-        for (const feed of JSON.parse(localStorage.getItem('feeds') || '[]')) {
-          const feedElement = document.createElement('a')
-          feedElement.href = `/${feed.id}`
-          const image = document.createElement('img')
-          image.src = feed.image
-          image.alt = feed.title
-          image.style.width = '100%'
-          feedElement.appendChild(image)
-          feedContainer.appendChild(feedElement)
-        }
         const form = document.querySelector('form')
         form.addEventListener('submit', event => {
           event.preventDefault()
@@ -89,10 +108,10 @@
             }
             return response
           }).then(response => response.json()).then(json => {
-            const feeds = JSON.parse(localStorage.getItem('feeds') || '[]')
+            const feeds = JSON.parse(localStorage.getItem('reader-feeds') || '[]')
             feeds.push(json)
-            localStorage.setItem('feeds', JSON.stringify(feeds))
-            alert('podcast added!')
+            localStorage.setItem('reader-feeds', JSON.stringify(feeds))
+            alert('feed added!')
             window.location.reload()
           })
         })
@@ -109,7 +128,7 @@
   <body>
     <div class="d-flex border-bottom">
       <h1 class="flex-1" style="padding-left: 1em;">
-        <a href="/" class="no-link">📻 Varp</a>
+        <a href="/" class="no-link">📜 Reader</a>
       </h1>
       <button class="js-toggle-feed-url add-button border-0" style="padding-right: 1em;">+</button>
     </div>
@@ -117,7 +136,17 @@
       <label for="feed_url" class="feed-url-label">URL: </label>
       <input id="feed_url" class="feed-url flex-1" placeholder="http://feeds.wnyc.org/moreperfect" />
     </form>
-    <div class="feeds"></div>
-    <audio controls class="controls"></audio>
+    <div class="feeds">
+      {{#each posts}}
+      <div class="feed-item">
+        <div class="body">
+          {{#markdown}}{{{content}}}{{/markdown}}
+        </div>
+        <a href="{{link}}" class="timestamp">
+          <time>{{pubDate}}</time>
+        </a>
+      </div>
+      {{/each}}
+    </div>
   </body>
 </html>
