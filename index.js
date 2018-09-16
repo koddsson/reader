@@ -60,10 +60,10 @@ async function syncFeeds() {
           item.content,
           itemPubDate.getTime(),
           item.link,
-          slugify(feed.title)
+          feed.id
         ])
       }
-      await db.run('UPDATE feeds SET lastUpdated = ?', [response.lastBuildDate])
+      await db.run('UPDATE feeds SET lastUpdated = ? WHERE id = ?', [response.lastBuildDate, feed.id])
     } else {
       debug('There are no new posts!')
     }
