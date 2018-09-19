@@ -92,6 +92,17 @@
       .timestamp { text-align: right; }
     </style>
     <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
       document.addEventListener('DOMContentLoaded', () => {
         const form = document.querySelector('form')
         form.addEventListener('submit', event => {
@@ -123,6 +134,50 @@
           form.classList.toggle('d-flex')
           form.hidden = !form.hidden
         })
+        function urlBase64ToUint8Array(base64String) {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+
+          const rawData = window.atob(base64);
+          const outputArray = new Uint8Array(rawData.length);
+
+          for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+          }
+          return outputArray;
+        }
+        document.querySelector('.js-toggle-notifications').addEventListener('click', () => {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(function(reg) {
+              const vapidPublicKey = 'BIqBY2Zs9H1pxRzIpGwklzwF4okxQDXuQVhiPYLJidGtYNhvTupWYKMv2NVOK39otMvS_3L9hUE1NtLqt3lTdXg'
+              const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+              reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: convertedVapidKey
+              }).then(async function(sub) {
+                console.log('Endpoint URL: ', sub.endpoint);
+                const response = await fetch('/web-push', {
+                  method: 'POST',
+                  body: JSON.stringify(sub),
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                })
+                const json = await response.json()
+                console.log(json)
+              }).catch(function(e) {
+                if (Notification.permission === 'denied') {
+                  console.warn('Permission for notifications was denied');
+                } else {
+                  console.error('Unable to subscribe to push', e);
+                }
+              });
+            })
+          }
+        })
       })
     </script>
   </head>
@@ -131,7 +186,8 @@
       <h1 class="flex-1" style="padding-left: 1em;">
         <a href="/" class="no-link">📜 Reader</a>
       </h1>
-      <button class="js-toggle-feed-url add-button border-0" style="padding-right: 1em;">+</button>
+      <button style="width:100px; font-size:3em; border: 0;" class="js-toggle-notifications">🔔</button>
+      <button style="width:100px; font-size:3em; border: 0;" class="js-toggle-feed-url">➕</button>
     </div>
     <form class="margin-0 border-bottom" hidden>
       <label for="feed_url" class="feed-url-label">URL: </label>
