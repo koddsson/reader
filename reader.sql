@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS feeds (
 );
 
 CREATE TABLE IF NOT EXISTS posts (
-  guid varchar(255),
+  guid varchar(255) PRIMARY KEY,
   title varchar(255),
   content text,
   pubDate integer,
