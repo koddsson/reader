@@ -45,63 +45,65 @@ async function getFeed(url) {
   return await parser.parseURL(req.body.url)
 }
 
+async function syncFeed() {
+  debug('running tick!')
+  const db = await dbPromise
+
+  let sendNotifications = false
+
+  for (const feed of await db.all('SELECT * FROM feeds')) {
+    let response
+
+    try {
+      response = await parser.parseURL(feed.url)
+    } catch (error) {
+      debug(error)
+      return
+    }
+
+    const feedLastUpdated = new Date(feed.lastUpdated)
+    if (new Date(response.lastBuildDate) > feedLastUpdated) {
+      debug('There are new posts!')
+      sendNotifications = true
+      for (const item of response.items) {
+        const itemPubDate = new Date(item.pubDate)
+        if (itemPubDate > new Date(response.lastBuildDate)) return
+        await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?)', [
+          item.guid.trim(),
+          item.title,
+          item.content,
+          itemPubDate.getTime(),
+          item.link,
+          feed.id
+        ])
+      }
+      await db.run('UPDATE feeds SET lastUpdated = ? WHERE id = ?', [response.lastBuildDate, feed.id])
+    } else {
+      debug('There are no new posts!')
+    }
+  }
+
+  if (sendNotifications) {
+    for (const subscription of await db.all('SELECT * FROM push_subscriptions')) {
+      debug('Sending a notification', subscription.endpoint)
+      const pushSubscription = {
+        endpoint: subscription.endpoint,
+        keys: {
+          auth: subscription.auth,
+          p256dh: subscription.p256dh
+        }
+      }
+
+      webpush.sendNotification(pushSubscription, 'Your Push Payload Text')
+    }
+  }
+}
+
 new CronJob({
   cronTime: '0 */15 * * * *',
   start: true,
   runOnInit: true,
-  onTick: async function() {
-    debug('running tick!')
-    const db = await dbPromise
-
-    let sendNotifications = false
-
-    for (const feed of await db.all('SELECT * FROM feeds')) {
-      let response
-
-      try {
-        response = await parser.parseURL(feed.url)
-      } catch (error) {
-        debug(error)
-        return
-      }
-
-      const feedLastUpdated = new Date(feed.lastUpdated)
-      if (new Date(response.lastBuildDate) > feedLastUpdated) {
-        debug('There are new posts!')
-        sendNotifications = true
-        for (const item of response.items) {
-          const itemPubDate = new Date(item.pubDate)
-          if (itemPubDate > new Date(response.lastBuildDate)) return
-          await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?)', [
-            item.guid.trim(),
-            item.title,
-            item.content,
-            itemPubDate.getTime(),
-            item.link,
-            feed.id
-          ])
-        }
-        await db.run('UPDATE feeds SET lastUpdated = ? WHERE id = ?', [response.lastBuildDate, feed.id])
-      } else {
-        debug('There are no new posts!')
-      }
-    }
-
-    if (sendNotifications) {
-      for (const subscription of await db.all('SELECT * FROM push_subscriptions')) {
-        debug('Sending a notification', subscription.endpoint)
-        const pushSubscription = {
-          endpoint: subscription.endpoint,
-          keys: {
-            auth: subscription.auth,
-            p256dh: subscription.p256dh
-          }
-        }
-
-        webpush.sendNotification(pushSubscription, 'Your Push Payload Text')
-      }
-    }
-  }
+  onTick: syncFeed
 })
 
 app.post('/feeds', async (req, res) => {
@@ -116,6 +118,8 @@ app.post('/feeds', async (req, res) => {
   const {title} = response
   const db = await dbPromise
   await db.run('INSERT INTO feeds VALUES(?, ?, ?, ?)', [slugify(title), title, req.body.url, null])
+
+  await syncFeed()
 
   return res.json({error: null})
 })
