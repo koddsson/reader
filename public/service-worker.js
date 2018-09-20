@@ -12,7 +12,7 @@ self.onnotificationclick = function(event) {
   // focuses if it is
   event.waitUntil(
     clients.matchAll({type: 'window'}).then(function(clientList) {
-      for (const i = 0; i < clientList.length; i++) {
+      for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i]
         if (client.url == '/' && 'focus' in client) {
           return client.focus()
