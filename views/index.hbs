@@ -196,15 +196,20 @@
     <div class="feeds">
       {{#each posts}}
       <div class="feed-item">
-        <div class="body d-flex">
-          {{{content}}}
-        </div>
-        <div class="footer border-top d-flex">
+        <div class="footer border-bottom d-flex">
           <div class="flex-1">{{title}}</div>
           <a href="{{link}}" class="timestamp">
             <time>{{pubDate}}</time>
           </a>
         </div>
+        <div class="body d-flex">
+          {{{content}}}
+        </div>
+        {{#if favoriteUrl}}
+        <div class="footer d-flex">
+          <a href="{{favoriteUrl}}" class="no-link" style="margin-left: auto; font-size: x-large;">⭐</a>
+        </div>
+        {{/if}}
       </div>
       {{/each}}
     </div>

@@ -138,6 +138,8 @@ app.get('/', async (req, res) => {
     const dayWithLeadingZero = day < 10 ? `0${day}` : day
 
     post.pubDate = `${date.getFullYear()}-${monthWithLeadingZero}-${dayWithLeadingZero}`
+
+    post.favoriteUrl = `${process.env.FAVORITE_URL}${encodeURIComponent(post.link)}`
   }
   return res.render('index', {posts})
 })
