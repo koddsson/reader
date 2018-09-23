@@ -78,7 +78,7 @@ async function syncFeed() {
             feed.id
           ])
         } catch (error) {
-          debug(`Failed to insert ${JSON.stringify(feed)} into posts`)t
+          debug(`Failed to insert ${JSON.stringify(feed)} into posts`)
         }
       }
       await db.run('UPDATE feeds SET lastUpdated = ? WHERE id = ?', [response.lastBuildDate, feed.id])
