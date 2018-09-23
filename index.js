@@ -68,14 +68,18 @@ async function syncFeed() {
       for (const item of response.items) {
         const itemPubDate = new Date(item.pubDate)
         if (itemPubDate > new Date(response.lastBuildDate)) return
-        await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?)', [
-          item.guid.trim(),
-          item.title,
-          item.content,
-          itemPubDate.getTime(),
-          item.link,
-          feed.id
-        ])
+        try {
+          await db.run('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?)', [
+            item.guid.trim(),
+            item.title,
+            item.content,
+            itemPubDate.getTime(),
+            item.link,
+            feed.id
+          ])
+        } catch (error) {
+          debug(`Failed to insert ${JSON.stringify(feed)} into posts`)t
+        }
       }
       await db.run('UPDATE feeds SET lastUpdated = ? WHERE id = ?', [response.lastBuildDate, feed.id])
     } else {
