@@ -41,10 +41,6 @@ function slugify(text) {
     .replace(/-+$/, '') // Trim - from end of text
 }
 
-async function getFeed(url) {
-  return await parser.parseURL(req.body.url)
-}
-
 async function syncFeed() {
   debug('running tick!')
   const db = await dbPromise

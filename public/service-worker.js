@@ -14,7 +14,7 @@ self.onnotificationclick = function(event) {
     clients.matchAll({type: 'window'}).then(function(clientList) {
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i]
-        if (client.url == '/' && 'focus' in client) {
+        if (client.url === '/' && 'focus' in client) {
           return client.focus()
         }
       }

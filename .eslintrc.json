@@ -2,5 +2,15 @@
   "extends": [
     "plugin:github/es6",
     "plugin:github/node"
+  ],
+  "overrides": [
+    {
+      "files": ["public/**/*.js"],
+      "globals": {
+        "clients": "readonly",
+        "self": "readonly",
+        "document": "readonly"
+      }
+    }
   ]
 }
