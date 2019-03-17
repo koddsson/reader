@@ -14,18 +14,18 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "cron": "^1.4.1",
-    "debug": "^4.0.1",
+    "cron": "^1.7.0",
+    "debug": "^4.1.1",
     "dotenv": "^6.0.0",
-    "express": "^4.16.3",
-    "hbs": "^4.0.1",
+    "express": "^4.16.4",
+    "hbs": "^4.0.3",
     "helper-markdown": "^1.0.0",
-    "rss-parser": "^3.4.3",
-    "sqlite": "^3.0.0",
+    "rss-parser": "^3.7.0",
+    "sqlite": "^3.0.2",
     "web-push": "^3.3.3"
   },
   "devDependencies": {
-    "eslint": "^5.4.0",
+    "eslint": "^5.15.2",
     "eslint-plugin-github": "^1.2.1"
   }
 }
